@@ -1,11 +1,10 @@
 class Dog
-    attr_accessor :name, :breed, :id
-
-    def initialize(id: nil, name:, breed:)
-      @id = id
-      @name = name
-      @breed = breed
-    end
+    attr_accessor :name, :id, :breed;
+    def initialize(id:nil,name:,breed:) 
+        @id =id
+        @name=name
+        @breed =breed
+    end   
 
     def self.create_table
         sql = <<-SQL
@@ -39,23 +38,25 @@ class Dog
 
     end
 
-    def self.create_table
+    def self.create(name:, breed:)
         dog = Dog.new(name:name, breed:breed)
         dog.save
 
     end
 
     def self.new_from_db(row)
-        self.new(id: row[0], name: row[1], breed:[2])
+        self.new(id: row[0], name: row[1], breed: row[2])
     end
 
     def self.all
         sql = <<-SQL
-        SELECT * 
-        FROM dogs
+         SELECT * 
+         FROM dogs
         SQL
 
-        DB[:conn].execute(sql)
+        DB[:conn].execute(sql).map do |row|
+            self.new_from_db(row)
+        end
     end
 
     def self.find_by_name(name)
@@ -70,7 +71,7 @@ class Dog
         end.first
     end
 
-    def self.find_ID(id)
+    def self.find(id)
         sql = <<-SQL
         SELECT *
         FROM dogs
